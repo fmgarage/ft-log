@@ -14,6 +14,10 @@ For the documentation of the functions' parameters, take a look their source.
 
 We recommend creating a filter to display only MBS messages. Enter 'MBS' into the search field, hit return and change the 'any' selector to 'library', then hit the save button. You can also create a filter for all FileMaker messages using process=FileMaker Pro.
 
+![console](docs/assets/console.png)
+
+
+
 ## Thank You!
 
 If you find this useful, please consider sponsoring.
