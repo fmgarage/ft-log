@@ -1,0 +1,30 @@
+/*	FTLog.init( _level; _target; _message )
+	@author Nils <nils.waldherr@fmgarage.com>
+	@copyright ©2021 FMGARAGE
+	@version 1.0.0-100 - 22.05.2021 
+	@param int _level = 0: off -- 1: fatal, 2: error, 3: warning, 4: info, 5: debug
+	@param string _target 
+	@param strin _message -- default message
+	@return true
+	
+*/
+Case(
+
+	/*	return version
+	    ----------------------------------------------------------------------------------
+	*/
+	_level = "--version" or $_Db.inVersionMode; 1000000;
+	
+	
+	/*	main
+		----------------------------------------------------------------------------------
+	*/
+	Let(
+		[
+			$$FTLog.level = Case( _level > 0; _level );
+			$$FTLog.target = Case( _level > 0; _target );
+			$$FTLog.message = Case( _level > 0; _message )
+		];
+		True
+	)
+)

@@ -1,0 +1,165 @@
+/*	FTLog.insert_v3( _target; _level; _indent; _message )
+	@author Nils <nils.waldherr@fmgarage.com>
+	@copyright ©2021 FMGARAGE
+	@version 1.0.0-100 - 09.10.2013
+	         1.1.0-101 - 30.01.2014 - NW: ignore empty $$FTLog.level, default level =4
+	         1.2.0-102 - 31.01.2014 - NW: microtime as auto enter
+	         1.3.0-103 - 14.02.2014 - NW: returning last inserted _id
+             1.4.0-104 - 20.02.2014 - NW: --version
+             1.5.0-105 - 11.07.2015 - NW: revision
+             1.5.1-106 - 23.07.2015 - AB: return function name
+	         2.0.0-107 - 22.05.2021 - NW: rewrite w lot to file, console
+	         3.0.0-108 - 29.06.2021 – NW: _indent, counter
+	@param string _target 
+	@param int _level = 5 -- 1: fatal, 2: error, 3: warning, 4: info, 5: debug
+	@param string _message using placeholders for #t timestamp
+	@return null | string error
+	
+	@uses function SIOFile.getPath()
+	
+	@test FTLog.insert ( "desktop/log.txt"; ""; "#t	ping" )
+	@test FTLog.insert ( "console"; ""; "ping" )
+	@test FTLog.insert ( "table"; ""; "ping" )
+	
+	@todo PSOS
+
+*/
+Case(
+
+	/*	return version
+	    ----------------------------------------------------------------------------------
+	*/
+	_target = "--version" or $_Db.inVersionMode; 2000000;
+	
+	
+	/*	preconditions
+		----------------------------------------------------------------------------------
+	*/
+
+	// log level
+	$$FTLog.level+0 = 0 or not IsEmpty( _level ) and $$FTLog.level < _level;
+	"";
+	
+	// MBS not installed
+	MBS( "VersionAutoupdate" ) = "?"; "ERROR: plugin MBS required";
+
+
+	/*	main
+		----------------------------------------------------------------------------------
+	*/
+	Let(
+		[
+			$$FTLog.indent = $$FTLog.indent + Case( _indent < 0; _indent +0 );
+			indent = Case( $$FTLog.indent > 0; Substitute( 10^$$FTLog.indent -1; 9; "    " ));
+			r = Case(
+				_indent > 0;
+				Let(
+					[
+						$$FTLog.counter = 1 + Case(
+							Get( CurrentTimeUTCMilliseconds ) - $$FTLog.start < 1000; 
+							$$FTLog.counter
+						);
+						$$FTLog.start = Get( CurrentTimeUTCMilliseconds )
+					];
+					""
+				)
+			);
+			_target = GetValue( List( _target; $$FTLog.target; "console" ); 1 );
+			table_error = _target = "table" 
+				and not ExecuteSQL(
+					"select count( TableName ) from FileMaker_Tables where TableName = ?"; 
+					""; 
+					""; 
+					"FTLog"
+				);
+			_target = Case( table_error; "console"; _target );
+			target_is_file = _target ≠ "console" and _target ≠ "table";
+			_message = Trim(
+					Substitute(
+						Case( 
+							IsEmpty( _message ); 
+							Case( 
+								IsEmpty( $$FTLog.message ); 
+								"#t #l #s #p "; 
+								$$FTLog.message 
+							); 
+							_message 
+						);
+						["#t"; Case( target_is_file; Get( CurrentTimestamp ))];
+						["#s"; Case( _target ≠ "table"; Get( ScriptName ))];
+						["#p"; Case( _target ≠ "table"; Get( ScriptParameter ))];
+						["#c"; Case( $$FTLog.counter > 0; $$FTLog.counter )];
+						["#l"; Case(
+								_target ≠ "table";
+								Choose( 
+									Case( IsEmpty( _level ); 5; _level )-1;
+									"FATAL"; "ERROR"; "WARNING"; "INFO"; "DEBUG"
+								)
+							)
+						]
+					)
+				)
+				& Case( table_error; " (table FTLog not available!)" )
+		];
+		Case(
+
+			/*	log to console
+				----------------------------------
+			*/
+			_target = "console";
+			Let( 
+				r = MBS( "Log"; indent & _message );
+				Case(
+					MBS( "IsError" );
+					"ERROR: MBS.Log returned '" & r & "'"
+				)
+			);
+		
+		
+		
+			/*	log to table
+				----------------------------------
+			*/			
+			_target = "table";
+			Let(
+				r = MBS( 
+					"FM.SQL.Execute"; 
+					Get( FileName ); 
+					"insert into \"FTLog\" ( a_level, a_message ) values ( ?, ? )" ;
+					Case( IsEmpty( _level ); 5; _level );
+					_message
+				);
+				Case(
+					MBS( "IsError" );
+					"ERROR: MBS.FM.SQL.Execute returned '" & r & "'"
+				)
+			);
+
+
+	
+			/*	log to file
+				----------------------------------
+			*/			
+			Let(
+				[
+					path = SIOFile.getPath( _target; "" );
+					r = MBS( 
+						"Text.AppendTextFile";
+						_message & ¶;
+						path; 
+						"utf8" 
+					)
+				];
+				Case(
+					MBS( "IsError" );
+					"ERROR: MBS.Text.AppendTextFile returned '" & r & "'"
+				)
+			)
+		)
+		// epilog
+		& Let(
+			$$FTLog.indent = $$FTLog.indent + Case( _indent > 0; _indent +0 );
+			""
+		)			
+	)
+)
