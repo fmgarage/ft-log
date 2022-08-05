@@ -10,6 +10,10 @@ Please download the example and copy the custom functions to your app. From the 
 
 For the documentation of the functions' parameters, take a look their source.
 
+### Using Console.app
+
+We recommend creating a filter to display only MBS messages. Enter 'MBS' into the search field, hit return and change the 'any' selector to 'library', then hit the save button. You can also create a filter for all FileMaker messages using process=FileMaker Pro.
+
 ## Thank You!
 
 If you find this useful, please consider sponsoring.
