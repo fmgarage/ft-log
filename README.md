@@ -10,4 +10,6 @@ Please download the example and copy the custom functions to your app. From the 
 
 For the documentation of the functions' parameters, take a look their source.
 
+## Thank You!
 
+If you find this useful, please consider sponsoring.
