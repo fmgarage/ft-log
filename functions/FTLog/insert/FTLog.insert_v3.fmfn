@@ -9,13 +9,14 @@
              1.5.0-105 - 11.07.2015 - NW: revision
              1.5.1-106 - 23.07.2015 - AB: return function name
 	         2.0.0-107 - 22.05.2021 - NW: rewrite w lot to file, console
-	         3.0.0-108 - 29.06.2021 – NW: _indent, counter
-	@param string _target 
+	         3.0.0-109 - 29.06.2021 – NW: _indent, counter
+	@param string _target = 'console' -- 'console', path to textfile or 'table'
 	@param int _level = 5 -- 1: fatal, 2: error, 3: warning, 4: info, 5: debug
 	@param string _message using placeholders for #t timestamp
 	@return null | string error
 	
 	@uses function SIOFile.getPath()
+	@uses table FTLog when loggin to table ( a_level, a_message )
 	
 	@test FTLog.insert ( "desktop/log.txt"; ""; "#t	ping" )
 	@test FTLog.insert ( "console"; ""; "ping" )

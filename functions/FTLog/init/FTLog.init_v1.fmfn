@@ -3,8 +3,8 @@
 	@copyright ©2021 FMGARAGE
 	@version 1.0.0-100 - 22.05.2021 
 	@param int _level = 0: off -- 1: fatal, 2: error, 3: warning, 4: info, 5: debug
-	@param string _target 
-	@param strin _message -- default message
+	@param string _target = 'console' -- 'console', path to textfile or 'table'
+	@param string _message -- default message
 	@return true
 	
 */
