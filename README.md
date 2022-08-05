@@ -1,4 +1,4 @@
-<span style="background-color:#ffffff;"><img src="docs/assets/images/logo.png" style="height:80px;magin-bottom: 20px;"></span>
+<span style="background-color:#ffffff;"><img src="docs/assets/logo.png" style="height:80px;magin-bottom: 20px;"></span>
 
 Simple logging to macOS Console.app, to file or to a table.
 
